@@ -1,7 +1,5 @@
-import os
 import streamlit as st
 import pandas as pd
-from dotenv import load_dotenv
 from PyPDF2 import PdfReader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.embeddings import OpenAIEmbeddings
@@ -11,11 +9,9 @@ from langchain.memory import ConversationBufferMemory
 from langchain.chains import ConversationalRetrievalChain
 from htmlTemplates import css, bot_template, user_template
 
-# Load API Key
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-
-# Password for accessing the app
-PASSWORD = "test"
+# Load secrets from Streamlit's secrets manager
+OPENAI_API_KEY = st.secrets["OPENAI_API_KEY"]
+PASSWORD = st.secrets["PASSWORD"]
 
 # Authentication check
 if "authenticated" not in st.session_state:
@@ -27,10 +23,10 @@ if not st.session_state.authenticated:
         if user_password == PASSWORD:
             st.session_state.authenticated = True
             st.success("Access granted!")
-            st.experimental_rerun()  # Forces the app to refresh
+            st.experimental_rerun()  # Refresh UI after login
         else:
             st.error("Incorrect password!")
-    st.stop()  # Stop execution until authenticated
+    st.stop()  # Stop execution if authentication fails
 
 # Function to extract text from PDF
 def get_pdf_text(pdf_docs):
@@ -97,8 +93,7 @@ def handle_userinput(user_question):
 
 # Main function
 def main():
-    load_dotenv()
-    st.set_page_config(page_title="AnyBot", page_icon=":books:")
+    st.set_page_config(page_title="Anybot", page_icon=":books:")
     st.write(css, unsafe_allow_html=True)
 
     if "conversation" not in st.session_state:
@@ -106,7 +101,7 @@ def main():
     if "chat_history" not in st.session_state:
         st.session_state.chat_history = None
 
-    st.header("AnyBot")
+    st.header("Anybot")
     user_question = st.text_input("Ask a question about your documents:")
     if user_question:
         handle_userinput(user_question)
