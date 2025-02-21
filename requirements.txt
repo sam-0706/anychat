@@ -6,3 +6,4 @@ openai
 faiss-cpu
 altair
 langchain-community
+tiktoken
